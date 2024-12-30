@@ -1,0 +1,48 @@
+{
+    "dolgozó klíma ki": {
+        "entity_id": "climate.dolgozoszoba",
+        "action": "turn_off",
+        "message": "A dolgozószobában a klíma ki lett kapcsolva."
+    },
+    "dolgozó klíma be": {
+        "entity_id": "climate.dolgozoszoba",
+        "action": "turn_on",
+        "message": "A dolgozószobában a klíma be lett kapcsolva."
+    },
+    "nappali klíma ki": {
+        "entity_id": "climate.nappali",
+        "action": "turn_off",
+        "message": "A nappaliban a klíma ki lett kapcsolva."
+    },
+    "nappali klíma be": {
+        "entity_id": "climate.nappali",
+        "action": "turn_on",
+        "message": "A nappaliban a klíma be lett kapcsolva."
+    },
+    "gyerekszoba klíma ki": {
+        "entity_id": "climate.gyerekszoba",
+        "action": "turn_off",
+        "message": "A gyerekszobában a klíma ki lett kapcsolva."
+    },
+    "gyerekszoba klíma be": {
+        "entity_id": "climate.gyerekszoba",
+        "action": "turn_on",
+        "message": "A gyerekszobában a klíma be lett kapcsolva."
+    },
+    "hálószoba klíma ki": {
+        "entity_id": "climate.haloszoba",
+        "action": "turn_off",
+        "message": "A hálószobában a klíma ki lett kapcsolva."
+    },
+    "hálószoba klíma be": {
+        "entity_id": "climate.haloszoba",
+        "action": "turn_on",
+        "message": "A hálószobában a klíma be lett kapcsolva."
+    },
+    "ideje dolgozni": {
+        "entity_id": "button.wake_on_lan_2c_f0_5d_7f_75_e4",
+        "action": "press",
+        "message": "A számítógépen be lett kapcsolva. Jó munkát!"
+    }
+
+}
