@@ -8,6 +8,7 @@ from pydub import AudioSegment
 from pydub.playback import play
 from pydub.generators import Sine
 from command import control_device
+import sys
 
 # Betölti a `.env` fájl tartalmát környezeti változóként
 load_dotenv()
@@ -37,7 +38,7 @@ async def listen_for_wake_word(wake_words: dict) -> str:
         print("Várok az ébresztőszóra...")
         recognizer.adjust_for_ambient_noise(source)
         try:
-            audio = recognizer.listen(source, timeout=10)  # 10 másodperc timeout
+            audio = recognizer.listen(source, timeout=60)  # 10 másodperc timeout
             text = recognizer.recognize_google(audio, language="hu-HU")
             print(f"Felismert szöveg: {text}")
             
@@ -75,7 +76,7 @@ def get_audio_input() -> str:
     with sr.Microphone() as source:
         print("Beszélj most...")
         try:
-            audio = recognizer.listen(source, timeout=10)  # 10 másodperces timeout
+            audio = recognizer.listen(source, timeout=60)  # 10 másodperces timeout
             return recognizer.recognize_google(audio, language="hu-HU")
         except sr.UnknownValueError:
             print("Nem sikerült felismerni a beszédet.")
@@ -97,18 +98,23 @@ async def generate_speech_from_text_to_file(text: str, voice: str, output_file: 
 
 # (5) Szöveg átalakítása hanggá és lejátszása
 async def handle_audio_response(response_text):
-    await generate_speech_from_text_to_file(response_text, VOICES[1], output_file)
-    
-    # MP3 fájl betöltése
-    audio = AudioSegment.from_file(output_file)
     try:
-        # Lejátszás
-        play(audio)
-    finally:
-        if os.path.exists(output_file):
-            # mp3 fájl törlése
-            os.remove(output_file)
-            print(f"A '{output_file}' fájl törölve lett.")
+        await generate_speech_from_text_to_file(response_text, VOICES[1], output_file)
+        
+        # MP3 fájl betöltése
+        audio = AudioSegment.from_file(output_file)
+        try:
+            # Lejátszás
+            play(audio)
+        finally:
+            if os.path.exists(output_file):
+                # mp3 fájl törlése
+                os.remove(output_file)
+                print(f"A '{output_file}' fájl törölve lett.")
+    except TypeError as e:
+        print(f"Hiba: A szöveg típusa nem megfelelő ({e}).")
+    except Exception as e:
+        print(f"Ismeretlen hiba történt a hanggenerálás során: {e}")
 
 # (3) Eszközvezérlés feldolgozása
 async def handle_device_command():
@@ -118,8 +124,12 @@ async def handle_device_command():
         print("Nem sikerült felismerni az eszközparancsot.")
         return
 
-    HA_response = control_device(device_command)
-    await handle_audio_response(HA_response)
+    try:
+        HA_response = control_device(device_command)
+        await handle_audio_response(HA_response)
+    except Exception as e:
+        print(f"Hiba történt az eszköz vezérlése közben: {e}")
+        await handle_audio_response("Hiba történt a parancs végrehajtása közben.")
 
 # (2) ChatGPT kérdés feldolgozása
 async def handle_gpt_question():
@@ -129,9 +139,13 @@ async def handle_gpt_question():
         print("Nem sikerült felismerni a kérdést.")
         return
 
-    chatgpt_response = get_chatgpt_response(gpt_question)
-    print(f"ChatGPT válasz: {chatgpt_response}")
-    await handle_audio_response(chatgpt_response)
+    try:
+        chatgpt_response = get_chatgpt_response(gpt_question)
+        print(f"ChatGPT válasz: {chatgpt_response}")
+        await handle_audio_response(chatgpt_response)
+    except Exception as e:
+        print(f"Hiba történt a kérdés feldolgozása közben: {e}")
+        await handle_audio_response("Hiba történt a kérdés feldolgozása közben.")
 
 # (7) Fő program
 async def main():
@@ -139,6 +153,7 @@ async def main():
     wake_words = {
         "Eszköz": handle_device_command,
         "Kérdés": handle_gpt_question,
+        "Kilépés": lambda: sys.exit()
     }
 
     while True:
