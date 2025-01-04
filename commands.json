@@ -62,6 +62,24 @@
                     "temperature": "attributes.temperature",
                     "humidity": "attributes.humidity"
                 }
+            },
+            {
+                "type": "get",
+                "url": "/api/states/sensor.yahoofinance_eurhuf_x",
+                "message_template": " Az euro és forint árfolyama: {state}",
+                "data_keys": {
+                    "state": "state",
+                    "temperature": "attributes.regularMarketPrice"
+                }
+            },
+            {
+                "type": "get",
+                "url": "/api/states/sensor.yahoofinance_usdhuf_x",
+                "message_template": " A dollár és forint árfolyama: {state}",
+                "data_keys": {
+                    "state": "state",
+                    "temperature": "attributes.regularMarketPrice"
+                }
             }
         ]
     }
